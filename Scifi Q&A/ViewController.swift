@@ -12,7 +12,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var numberOfQ: UILabel!
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
-    var index = 0
     var questionIndex = 1
     var score = 0
     var questionArray = [Question]()
@@ -47,27 +46,25 @@ class ViewController: UIViewController {
 
     @IBAction func redoBtn(_ sender: Any) {
         questionIndex = 1
+        score = 0
         questionArray.shuffle()
         putAnswer(number: 0)
-        syncScoreAndLabel(scoreText: "0", numberOfQuestion: 0)
-        for i in 0...2 {
-            answerButtons[i].isHidden = false
-        }
+        syncScoreAndLabel(scoreText: "0", numberOfQuestion: 1)
+        hideOptions(hide: false)
     }
     @IBAction func nextBtn(_ sender: Any) {
         questionIndex = (questionIndex + 1) % questionArray.count
-        if questionIndex == 0 {
+        // 重返回第一題
+        if numberOfQ.text == "10/10" {
             questionLabel.text = "恭喜你獲得\(score)分!"
-            numberOfQ.text = "10/10"
             questionIndex = 1
-            for i in 0...2 {
-                answerButtons[i].isHidden = true
-            }
+            hideOptions(hide: true)
         } else{
             putAnswer(number: questionIndex)
+            rightAnswer = questionArray[questionIndex].answer
             numberOfQ.text = String(format: "%02d" + "/10", questionIndex)
+            hideOptions(hide: false)
         }
-        
     }
     //填入題目與答案選項
     func putAnswer(number: Int) {
@@ -94,9 +91,7 @@ class ViewController: UIViewController {
                 scoreLabel.text = String(score)
                 questionIndex = 1
             }
-            for i in 0...2 {
-                answerButtons[i].isHidden = true
-            }
+            hideOptions(hide: true)
         } else if score < 100 {
             if userAnswer == rightAnswer {
                 score += 10
@@ -105,16 +100,10 @@ class ViewController: UIViewController {
             } else if score > 5 {
                 score -= 5
                 syncScoreAndLabel(scoreText: String(score), numberOfQuestion: questionIndex)
-                questionLabel.text = questionArray[questionIndex-1].description
-                for i in 0...2 {
-                    answerButtons[i].setTitle(questionArray[questionIndex-1].options[i], for: .normal)
-                }
+                putAnswer(number: questionIndex-1)
             } else {
                 numberOfQ.text = String(format: "%02d" + "/10", questionIndex)
-                questionLabel.text = questionArray[questionIndex-1].description
-                for i in 0...2 {
-                    answerButtons[i].setTitle(questionArray[questionIndex-1].options[i], for: .normal)
-                }
+                putAnswer(number: questionIndex-1)
             }
         }
     }
@@ -123,6 +112,10 @@ class ViewController: UIViewController {
         scoreLabel.text = scoreText
         numberOfQ.text = String(format: "%02d" + "/10", numberOfQuestion)
     }
-       
+    func hideOptions(hide: Bool){
+        for i in 0...2 {
+            answerButtons[i].isHidden = hide
+        }
+    }
 }
 
