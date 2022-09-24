@@ -59,7 +59,6 @@ class ViewController: UIViewController {
         // 重返回第一題
         if questionIndex == 0 {
             questionLabel.text = "恭喜你獲得\(score)分!"
-            questionIndex = 1
             hideOptions(hide: true)
             nextBtnOutlet.isHidden = true
         } else{
@@ -90,7 +89,6 @@ class ViewController: UIViewController {
             } else if score > 0{
                 score -= 5
             }
-            questionIndex = 1
             questionLabel.text = "恭喜你獲得\(score)分!"
             scoreLabel.text = String(score)
             nextBtnOutlet.isHidden = true
