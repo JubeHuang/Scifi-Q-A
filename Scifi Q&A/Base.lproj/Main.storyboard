@@ -119,6 +119,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="nextBtnOutlet" destination="eAL-gc-izI" id="SNZ-JD-7Tb"/>
                         <outlet property="numberOfQ" destination="4dM-z4-CD6" id="zwL-qa-SBc"/>
                         <outlet property="questionLabel" destination="Oby-Ul-GN0" id="Rkb-4l-40P"/>
                         <outlet property="scoreLabel" destination="IMv-6e-nm8" id="g9x-lO-GIQ"/>

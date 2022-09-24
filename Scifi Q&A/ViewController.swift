@@ -12,7 +12,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var numberOfQ: UILabel!
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
-    var questionIndex = 1
+    @IBOutlet weak var nextBtnOutlet: UIButton!
+    var questionIndex = 0
     var score = 0
     var questionArray = [Question]()
     var rightAnswer = ""
@@ -45,24 +46,26 @@ class ViewController: UIViewController {
     }
 
     @IBAction func redoBtn(_ sender: Any) {
-        questionIndex = 1
+        questionIndex = 0
         score = 0
         questionArray.shuffle()
         putAnswer(number: 0)
         syncScoreAndLabel(scoreText: "0", numberOfQuestion: 1)
         hideOptions(hide: false)
+        nextBtnOutlet.isHidden = false
     }
     @IBAction func nextBtn(_ sender: Any) {
         questionIndex = (questionIndex + 1) % questionArray.count
         // 重返回第一題
-        if numberOfQ.text == "10/10" {
+        if questionIndex == 0 {
             questionLabel.text = "恭喜你獲得\(score)分!"
             questionIndex = 1
             hideOptions(hide: true)
+            nextBtnOutlet.isHidden = true
         } else{
             putAnswer(number: questionIndex)
             rightAnswer = questionArray[questionIndex].answer
-            numberOfQ.text = String(format: "%02d" + "/10", questionIndex)
+            numberOfQ.text = String(format: "%02d" + "/10", questionIndex+1)
             hideOptions(hide: false)
         }
     }
@@ -73,49 +76,48 @@ class ViewController: UIViewController {
             //答案選項丟進按鈕title
             answerButtons[i].setTitle(questionArray[number].options[i], for: .normal)
         }
+        rightAnswer = questionArray[number].answer
     }
     
     @IBAction func correctAnswer(_ sender: UIButton) {
-        questionIndex += 1
+        questionIndex = (questionIndex + 1) % questionArray.count
         let userAnswer = sender.currentTitle!
-        rightAnswer = questionArray[questionIndex-2].answer
-        if questionIndex > 10{
+        //第十題按下按鈕時
+        if questionIndex == 0{
+            //儲存最後一題分數
             if userAnswer == rightAnswer {
                 score += 10
-                questionLabel.text = "恭喜你獲得\(score)分!"
-                scoreLabel.text = String(score)
-                questionIndex = 1
-            } else {
+            } else if score > 0{
                 score -= 5
-                questionLabel.text = "恭喜你獲得\(score)分!"
-                scoreLabel.text = String(score)
-                questionIndex = 1
             }
+            questionIndex = 1
+            questionLabel.text = "恭喜你獲得\(score)分!"
+            scoreLabel.text = String(score)
+            nextBtnOutlet.isHidden = true
             hideOptions(hide: true)
-        } else if score < 100 {
-            if userAnswer == rightAnswer {
-                score += 10
-                syncScoreAndLabel(scoreText: String(score), numberOfQuestion: questionIndex)
-                putAnswer(number: questionIndex-1)
-            } else if score > 5 {
-                score -= 5
-                syncScoreAndLabel(scoreText: String(score), numberOfQuestion: questionIndex)
-                putAnswer(number: questionIndex-1)
+        } else {
+            if rightAnswer != userAnswer {
+                if score > 0 {
+                    score -= 5
+                } else {
+                    score = 0
+                }
             } else {
-                numberOfQ.text = String(format: "%02d" + "/10", questionIndex)
-                putAnswer(number: questionIndex-1)
+                score += 10
             }
+            syncScoreAndLabel(scoreText: String(score), numberOfQuestion: questionIndex+1)
+            putAnswer(number: questionIndex)
         }
     }
     
     func syncScoreAndLabel(scoreText: String, numberOfQuestion: Int){
-        scoreLabel.text = scoreText
-        numberOfQ.text = String(format: "%02d" + "/10", numberOfQuestion)
+            scoreLabel.text = scoreText
+            numberOfQ.text = String(format: "%02d" + "/10", numberOfQuestion)
     }
     func hideOptions(hide: Bool){
-        for i in 0...2 {
-            answerButtons[i].isHidden = hide
-        }
+            for i in 0...2 {
+                answerButtons[i].isHidden = hide
+            }
     }
 }
 
